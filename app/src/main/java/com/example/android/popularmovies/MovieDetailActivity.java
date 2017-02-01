@@ -38,7 +38,12 @@ public class MovieDetailActivity extends AppCompatActivity {
                 mVoteAverage.setText(movieData.getVoteAverage());
                 mSynopsis.setText(movieData.getSynopsis());
 
-                Picasso.with(this).load(movieData.getPathToPoster()).resize(450, 650).into(mMoviePoster);
+                Picasso.with(this)
+                        .load(movieData.getPathToPoster())
+                        .placeholder(R.drawable.placeholder)
+                        .error(R.drawable.placeholder)
+                        .resize(450, 650)
+                        .into(mMoviePoster);
             }
         }
 

@@ -1,7 +1,6 @@
 package com.example.android.popularmovies;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,11 +13,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.utilities.AutofitGridLayoutManager;
-import com.example.android.popularmovies.utilities.NetworkUtils;
+import com.example.android.popularmovies.utilities.FetchMoviesTask;
 import com.example.android.popularmovies.utilities.ParcelableMovie;
-import com.example.android.popularmovies.utilities.PopularMoviesJsonUtils;
-
-import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler{
 
@@ -56,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
 
     private void loadMoviesData(){
         ShowMovies();
-        new FetchMoviesTask().execute(sortBy);
+        new FetchMoviesTask(this).execute(sortBy);
     }
 
     private void ShowMovies(){
@@ -64,9 +60,17 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
-    private void showError(){
+    public void showError(){
         mRecyclerView.setVisibility(View.INVISIBLE);
         mErrorTextView.setVisibility(View.VISIBLE);
+    }
+
+    public void passDataToAdapter(ParcelableMovie[] movies){
+        mMoviesAdapter.setmMoviesData(movies);
+    }
+
+    public void setVisibilityProgressIndicator(int visibility){
+        mProgressIndicator.setVisibility(visibility);
     }
 
     @Override
@@ -74,48 +78,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         Intent intentToDetail = new Intent(this, MovieDetailActivity.class);
         intentToDetail.putExtra(Intent.EXTRA_TEXT, movieInfo);
         startActivity(intentToDetail);
-    }
-
-    public class FetchMoviesTask extends AsyncTask<String, Void, ParcelableMovie[]>{
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mProgressIndicator.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected ParcelableMovie[] doInBackground(String... params) {
-
-            if(params.length == 0){
-                return null;
-            }
-
-            String sortBy = params[0];
-            URL requestUrl = NetworkUtils.buildMovieDataUrl(sortBy);
-
-            try {
-                String moviesJsonResponse = NetworkUtils
-                        .getResponseFromHttpUrl(requestUrl);
-                return PopularMoviesJsonUtils.getMoviesArrayFromJson(moviesJsonResponse);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-
-        }
-
-        @Override
-        protected void onPostExecute(ParcelableMovie[] movies) {
-            mProgressIndicator.setVisibility(View.INVISIBLE);
-            if(movies != null){
-                mMoviesAdapter.setmMoviesData(movies);
-            }
-            else{
-                showError();
-            }
-        }
     }
 
     @Override

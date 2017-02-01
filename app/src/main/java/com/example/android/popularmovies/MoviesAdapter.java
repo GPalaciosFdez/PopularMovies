@@ -52,7 +52,12 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         //TODO 4: Bind posters to holders using the info pass from the async task
         String pathToPoster = mMoviesData[position].getPathToPoster();
         ImageView destination = holder.mMovieImageView;
-        Picasso.with(destination.getContext()).load(pathToPoster).resize(450, 650).into(destination);
+        Picasso.with(destination.getContext())
+                .load(pathToPoster)
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .resize(450, 650)
+                .into(destination);
     }
 
     void setmMoviesData(ParcelableMovie[] moviesData) {
