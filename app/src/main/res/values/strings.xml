@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">PopularMovies</string>
+    <string name="app_name">Popular Movies</string>
+    <string name="popularity">Popularity</string>
+    <string name="rating">Rating</string>
+    <string name="error">There has been an error, please try again</string>
 </resources>

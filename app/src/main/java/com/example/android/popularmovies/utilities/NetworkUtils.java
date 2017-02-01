@@ -17,8 +17,6 @@ public final class NetworkUtils {
 
     private static final String API_KEY = "";
 
-    private static final String TAG = NetworkUtils.class.getSimpleName();
-
     private static final String MOVIE_IMG_BASE_URL = "http://image.tmdb.org/t/p";
     private static final String MOVIE_IMG_FILE_SIZE = "w185";
 
@@ -40,20 +38,8 @@ public final class NetworkUtils {
         return url;
     }
 
-    public static URL buildMovieImageUrl(String path) {
-        Uri builtUri = Uri.parse(MOVIE_IMG_BASE_URL).buildUpon()
-                .appendQueryParameter("/", MOVIE_IMG_FILE_SIZE)
-                .appendQueryParameter("/", path)
-                .build();
-
-        URL url = null;
-        try {
-            url = new URL(builtUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-
-        return url;
+    static String buildMovieImageUrl(String path) {
+        return MOVIE_IMG_BASE_URL + "/" + MOVIE_IMG_FILE_SIZE + "/" + path;
     }
 
     public static String getResponseFromHttpUrl(URL url) throws IOException {

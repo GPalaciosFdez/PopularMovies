@@ -5,23 +5,26 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
+
+import com.example.android.popularmovies.utilities.ParcelableMovie;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by gpalacios on 31/01/17.
  */
 
-public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder>{
+class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder>{
 
-    private String[] mMoviesData; //TODO: change to ParcelableMovie[]
+    private ParcelableMovie[] mMoviesData;
 
     private final MoviesAdapterOnClickHandler mClickHandler;
 
-    public interface MoviesAdapterOnClickHandler{
-        void onClick(String movieInfo);
+    interface MoviesAdapterOnClickHandler{
+        void onClick(ParcelableMovie movieInfo);
     }
 
-    public MoviesAdapter(MoviesAdapterOnClickHandler clickHandler){
+    MoviesAdapter(MoviesAdapterOnClickHandler clickHandler){
         mClickHandler = clickHandler;
     }
 
@@ -30,6 +33,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
         if(mMoviesData == null){
             return 0;
         }
+        int length = mMoviesData.length;
+        String lengthStr = Integer.toString(length);
         return mMoviesData.length;
     }
 
@@ -45,30 +50,31 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
     @Override
     public void onBindViewHolder(MoviesAdapterViewHolder holder, int position) {
         //TODO 4: Bind posters to holders using the info pass from the async task
-        String movie = mMoviesData[position];
-        holder.mMovieTextView.setText(movie);
+        String pathToPoster = mMoviesData[position].getPathToPoster();
+        ImageView destination = holder.mMovieImageView;
+        Picasso.with(destination.getContext()).load(pathToPoster).resize(450, 650).into(destination);
     }
 
-    public void setmMoviesData(String[] moviesData) {
-        moviesData = mMoviesData;
+    void setmMoviesData(ParcelableMovie[] moviesData) {
+        mMoviesData = moviesData;
         notifyDataSetChanged();
     }
 
     class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         //TODO: change TextView for View with movie image
-        public final TextView mMovieTextView;
+        final ImageView mMovieImageView;
 
-        public MoviesAdapterViewHolder(View view){
+        MoviesAdapterViewHolder(View view){
             super(view);
-            mMovieTextView = (TextView) view.findViewById(R.id.tv_movie_data);
+            mMovieImageView = (ImageView) view.findViewById(R.id.iv_movie_poster);
             view.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            String movieInfo = mMoviesData[adapterPosition];
+            ParcelableMovie movieInfo = mMoviesData[adapterPosition];
             //TODO 5: pass to MainActivity.onClick() the ParcelableMovie clicked from the array
             mClickHandler.onClick(movieInfo);
         }
