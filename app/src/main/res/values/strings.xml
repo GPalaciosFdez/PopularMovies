@@ -3,4 +3,7 @@
     <string name="popularity">Popularity</string>
     <string name="rating">Rating</string>
     <string name="error">There has been an error, please try again</string>
+
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
 </resources>

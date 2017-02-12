@@ -16,13 +16,8 @@ import com.squareup.picasso.Picasso;
 
 class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder>{
 
-    private ParcelableMovie[] mMoviesData;
-
     private final MoviesAdapterOnClickHandler mClickHandler;
-
-    interface MoviesAdapterOnClickHandler{
-        void onClick(ParcelableMovie movieInfo);
-    }
+    private ParcelableMovie[] mMoviesData;
 
     MoviesAdapter(MoviesAdapterOnClickHandler clickHandler){
         mClickHandler = clickHandler;
@@ -33,8 +28,6 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         if(mMoviesData == null){
             return 0;
         }
-        int length = mMoviesData.length;
-        String lengthStr = Integer.toString(length);
         return mMoviesData.length;
     }
 
@@ -49,7 +42,6 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
 
     @Override
     public void onBindViewHolder(MoviesAdapterViewHolder holder, int position) {
-        //TODO 4: Bind posters to holders using the info pass from the async task
         String pathToPoster = mMoviesData[position].getPathToPoster();
         ImageView destination = holder.mMovieImageView;
         Picasso.with(destination.getContext())
@@ -65,9 +57,12 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         notifyDataSetChanged();
     }
 
+    interface MoviesAdapterOnClickHandler {
+        void onClick(ParcelableMovie movieInfo);
+    }
+
     class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        //TODO: change TextView for View with movie image
         final ImageView mMovieImageView;
 
         MoviesAdapterViewHolder(View view){
@@ -80,7 +75,6 @@ class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterView
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             ParcelableMovie movieInfo = mMoviesData[adapterPosition];
-            //TODO 5: pass to MainActivity.onClick() the ParcelableMovie clicked from the array
             mClickHandler.onClick(movieInfo);
         }
     }

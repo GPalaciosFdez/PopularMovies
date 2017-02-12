@@ -20,13 +20,21 @@ public final class NetworkUtils {
     private static final String MOVIE_IMG_BASE_URL = "http://image.tmdb.org/t/p";
     private static final String MOVIE_IMG_FILE_SIZE = "w185";
 
-    private static final String MOVIE_DATA_BASE_URL = "http://api.themoviedb.org/3/discover/movie";
+    private static final String MOVIE_DATA_BASE_URL = "http://api.themoviedb.org/3/";
+    private static final String MOVIE_DISCOVER_PATH = "discover";
 
-    public static URL buildMovieDataUrl(String query) {
+    private static final String MOVIE_MOVIE_PATH = "movie";
+    private static final String MOVIE_TRAILER_PATH = "videos";
+    private static final String MOVIE_REVIEW_PATH = "reviews";
+
+    static URL buildMovieDataUrl(String query) {
         Uri builtUri = Uri.parse(MOVIE_DATA_BASE_URL).buildUpon()
+                .appendPath(MOVIE_DISCOVER_PATH)
+                .appendPath(MOVIE_MOVIE_PATH)
                 .appendQueryParameter("sort_by", query + ".desc")
                 .appendQueryParameter("api_key", API_KEY)
                 .build();
+
 
         URL url = null;
         try {
@@ -42,7 +50,44 @@ public final class NetworkUtils {
         return MOVIE_IMG_BASE_URL + "/" + MOVIE_IMG_FILE_SIZE + "/" + path;
     }
 
-    public static String getResponseFromHttpUrl(URL url) throws IOException {
+    static URL buildTrailerUrl(String id) {
+        Uri builtUri = Uri.parse(MOVIE_DATA_BASE_URL).buildUpon()
+                .appendPath(MOVIE_MOVIE_PATH)
+                .appendPath(id)
+                .appendPath(MOVIE_TRAILER_PATH)
+                .appendQueryParameter("api_key", API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+    static URL buildReviewUrl(String id) {
+        Uri builtUri = Uri.parse(MOVIE_DATA_BASE_URL).buildUpon()
+                .appendPath(MOVIE_MOVIE_PATH)
+                .appendPath(id)
+                .appendPath(MOVIE_REVIEW_PATH)
+                .appendQueryParameter("api_key", API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return url;
+    }
+
+
+    static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
             InputStream in = urlConnection.getInputStream();
