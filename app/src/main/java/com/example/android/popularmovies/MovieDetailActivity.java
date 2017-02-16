@@ -1,50 +1,72 @@
 package com.example.android.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.data.FavoritesColumns;
+import com.example.android.popularmovies.data.FavoritesProvider;
 import com.example.android.popularmovies.utilities.FetchTrailersTask;
 import com.example.android.popularmovies.utilities.ParcelableMovie;
 import com.squareup.picasso.Picasso;
 
+
 public class MovieDetailActivity extends AppCompatActivity {
 
-    private TextView mMovieTitle;
-    private TextView mReleaseDate;
-    private ImageView mMoviePoster;
-    private TextView mVoteAverage;
-    private TextView mSynopsis;
+    private final String TAG = MovieDetailActivity.class.getSimpleName();
+    ParcelableMovie movieData;
     private LinearLayout mTrailers;
     private LinearLayout mReviews;
+    private Button mFavoriteButton;
+    private boolean isFavorite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
-        mMovieTitle = (TextView) findViewById(R.id.tv_movie_title);
-        mReleaseDate = (TextView) findViewById(R.id.tv_release_date);
-        mVoteAverage = (TextView) findViewById(R.id.tv_vote_average);
-        mSynopsis = (TextView) findViewById(R.id.tv_synopsis);
-        mMoviePoster = (ImageView) findViewById(R.id.iv_movie_poster);
+        TextView mMovieTitle = (TextView) findViewById(R.id.tv_movie_title);
+        TextView mReleaseDate = (TextView) findViewById(R.id.tv_release_date);
+        TextView mVoteAverage = (TextView) findViewById(R.id.tv_vote_average);
+        TextView mSynopsis = (TextView) findViewById(R.id.tv_synopsis);
+        ImageView mMoviePoster = (ImageView) findViewById(R.id.iv_movie_poster);
         mTrailers = (LinearLayout) findViewById(R.id.ll_trailers);
         mReviews = (LinearLayout) findViewById(R.id.ll_reviews);
+        mFavoriteButton = (Button) findViewById(R.id.button_favorite);
 
         Intent intentThatStartedThisActivity = getIntent();
 
         if(intentThatStartedThisActivity != null){
             if(intentThatStartedThisActivity.hasExtra(Intent.EXTRA_TEXT)){
-                ParcelableMovie movieData = intentThatStartedThisActivity.getParcelableExtra(Intent.EXTRA_TEXT);
+                movieData = intentThatStartedThisActivity.getParcelableExtra(Intent.EXTRA_TEXT);
                 mMovieTitle.setText(movieData.getTitle());
                 mReleaseDate.setText(movieData.getReleaseDate());
                 mVoteAverage.setText(movieData.getVoteAverage());
                 mSynopsis.setText(movieData.getSynopsis());
+
+                isFavorite = (movieData.getIsFavorite() == 1);
+
+                if (!isFavorite) {
+                    if (getContentResolver().query(FavoritesProvider.Favorites.withId(movieData.getId()), null, null, null, null).moveToFirst()) {
+                        isFavorite = true;
+                    } else {
+                        mFavoriteButton.setText(getString(R.string.addFavorite));
+                    }
+
+
+                }
+                if (isFavorite) {
+                    mFavoriteButton.setText(getString(R.string.deleteFavorite));
+                }
+
 
                 Picasso.with(this)
                         .load(movieData.getPathToPoster())
@@ -57,12 +79,13 @@ public class MovieDetailActivity extends AppCompatActivity {
             }
         }
 
+        mFavoriteButton.setClickable(true);
     }
 
     public void populateTrailers(ParcelableMovie movie) {
         for (int i = 0; i < movie.getTrailers().size() - 1; i++) {
             TextView child = (TextView) getLayoutInflater().inflate(R.layout.detail_child, null);
-            child.setText("TRAILER " + i);
+            child.setText(getString(R.string.trailer) + i);
             child.setTag(movie.getTrailers().get(i));
 
             mTrailers.addView(child);
@@ -74,7 +97,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         for (String review : movie.getReviews()) {
             count++;
             TextView child = (TextView) getLayoutInflater().inflate(R.layout.detail_child, null);
-            child.setText("REVIEW " + count);
+            child.setText(getString(R.string.review) + count);
             child.setTag(review);
 
             mReviews.addView(child);
@@ -90,4 +113,48 @@ public class MovieDetailActivity extends AppCompatActivity {
             }
         }
     }
+
+    public void handleFavorite(View view) {
+        boolean favorite = isFavorite;
+        if (favorite) {
+            deleteFavorite(movieData);
+            isFavorite = false;
+            mFavoriteButton.setText(getString(R.string.addFavorite));
+        }
+        if (!favorite) {
+            addFavorite(movieData);
+            isFavorite = true;
+            mFavoriteButton.setText(getString(R.string.deleteFavorite));
+        }
+    }
+
+    private void addFavorite(ParcelableMovie movieData) {
+
+        ContentValues values = new ContentValues();
+
+        values.put(FavoritesColumns.ID, movieData.getId());
+        values.put(FavoritesColumns.TITLE, movieData.getTitle());
+        values.put(FavoritesColumns.RELEASE_DATE, movieData.getReleaseDate());
+        values.put(FavoritesColumns.PATH_TO_POSTER, movieData.getPathToPoster());
+        values.put(FavoritesColumns.VOTE_AVERAGE, movieData.getVoteAverage());
+        values.put(FavoritesColumns.SYNOPSIS, movieData.getSynopsis());
+        values.put(FavoritesColumns.IS_FAVORITE, 1);
+
+
+        try {
+            getContentResolver().insert(FavoritesProvider.Favorites.CONTENT_URI, values);
+        } catch (Exception e) {
+            Log.e(TAG, "Error inserting", e);
+        }
+    }
+
+    private int deleteFavorite(ParcelableMovie movieData) {
+
+        String[] id = new String[]{movieData.getId()};
+
+        return getContentResolver().delete(FavoritesProvider.Favorites.CONTENT_URI, FavoritesColumns.ID + "=?", id);
+
+    }
+
+
 }

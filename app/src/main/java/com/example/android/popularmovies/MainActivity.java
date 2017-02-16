@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.utilities.AutofitGridLayoutManager;
+import com.example.android.popularmovies.utilities.FetchFavoritesTask;
 import com.example.android.popularmovies.utilities.FetchMoviesTask;
 import com.example.android.popularmovies.utilities.ParcelableMovie;
 
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private TextView mErrorTextView;
 
     private String sortBy = "popularity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     private void loadMoviesData(){
         ShowMovies();
         new FetchMoviesTask(this).execute(sortBy);
+    }
+
+    private void loadFavorites() {
+        ShowMovies();
+        new FetchFavoritesTask(this).execute();
     }
 
     private void ShowMovies(){
@@ -97,6 +104,10 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         if(item.getItemId() == R.id.action_rated){
             sortBy = "vote_average";
             loadMoviesData();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_favorite) {
+            loadFavorites();
             return true;
         }
 

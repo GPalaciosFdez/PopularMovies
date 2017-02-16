@@ -6,4 +6,11 @@
 
     <string name="trailers">Trailers</string>
     <string name="reviews">Reviews</string>
+
+    <string name="addFavorite">Add favorite</string>
+    <string name="deleteFavorite">Delete favorite</string>
+    <string name="favorite">Favorite</string>
+    <string name="trailer">"TRAILER "</string>
+    <string name="review">"REVIEW "</string>
+
 </resources>

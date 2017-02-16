@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class ParcelableMovie implements Parcelable {
 
+
     public static final Creator<ParcelableMovie> CREATOR = new Creator<ParcelableMovie>() {
         @Override
         public ParcelableMovie createFromParcel(Parcel in) {
@@ -23,33 +24,53 @@ public class ParcelableMovie implements Parcelable {
             return new ParcelableMovie[size];
         }
     };
+    private String id;
     private String title;
     private String releaseDate;
     private String pathToPoster;
     private String voteAverage;
     private String synopsis;
-    private String id;
     private ArrayList<String> trailers;
     private ArrayList<String> reviews;
-
-    ParcelableMovie(String movieId, String movieTitle, String movieReleaseDate, String moviePathToPoster, String movieVoteAverage, String movieSynopsis) {
-        this.id = movieId;
-        this.title = movieTitle;
-        this.releaseDate = movieReleaseDate;
-        this.pathToPoster = moviePathToPoster;
-        this.voteAverage = movieVoteAverage;
-        this.synopsis = movieSynopsis;
-    }
+    private int isFavorite = 0;
 
     private ParcelableMovie(Parcel in) {
+        id = in.readString();
         title = in.readString();
         releaseDate = in.readString();
         pathToPoster = in.readString();
         voteAverage = in.readString();
         synopsis = in.readString();
-        id = in.readString();
         trailers = in.createStringArrayList();
         reviews = in.createStringArrayList();
+        isFavorite = in.readInt();
+    }
+
+    ParcelableMovie(String id, String title, String releaseDate, String pathToPoster, String voteAverage, String synopsis) {
+        this.id = id;
+        this.title = title;
+        this.releaseDate = releaseDate;
+        this.pathToPoster = pathToPoster;
+        this.voteAverage = voteAverage;
+        this.synopsis = synopsis;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(title);
+        dest.writeString(releaseDate);
+        dest.writeString(pathToPoster);
+        dest.writeString(voteAverage);
+        dest.writeString(synopsis);
+        dest.writeStringList(trailers);
+        dest.writeStringList(reviews);
+        dest.writeInt(isFavorite);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public String getSynopsis() {
@@ -92,20 +113,12 @@ public class ParcelableMovie implements Parcelable {
         this.reviews = reviews;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getIsFavorite() {
+        return isFavorite;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(title);
-        dest.writeString(releaseDate);
-        dest.writeString(pathToPoster);
-        dest.writeString(voteAverage);
-        dest.writeString(synopsis);
-        dest.writeString(id);
-        dest.writeStringList(trailers);
-        dest.writeStringList(reviews);
+    void setIsFavorite(int favorite) {
+        this.isFavorite = favorite;
     }
+
 }

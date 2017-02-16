@@ -61,6 +61,18 @@
                     android:layout_gravity="center"
                     android:textSize="24sp"
                     />
+
+                <Button
+                    android:id="@+id/button_favorite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:backgroundTint="#76b184"
+                    android:clickable="false"
+                    android:onClick="handleFavorite"
+                    android:text=""
+                    android:textSize="24sp" />
+
             </LinearLayout>
 
         </LinearLayout>
@@ -78,13 +90,18 @@
             android:id="@+id/ll_trailers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="#76b184"
+                android:gravity="center"
                 android:text="@string/trailers"
-                android:textSize="25sp" />
+                android:textSize="30sp" />
 
         </LinearLayout>
 
@@ -92,13 +109,18 @@
             android:id="@+id/ll_reviews"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="#76b184"
+                android:gravity="center"
                 android:text="@string/reviews"
-                android:textSize="25sp" />
+                android:textSize="30sp" />
 
         </LinearLayout>
 
