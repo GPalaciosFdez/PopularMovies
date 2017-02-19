@@ -17,7 +17,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="#76b184"
+                android:background="@color/detailGreen"
                 android:gravity="center"
                 android:padding="5dp"
                 android:textColor="#000"
@@ -67,7 +67,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:backgroundTint="#76b184"
+                    android:backgroundTint="@color/detailGreen"
                     android:clickable="false"
                     android:onClick="handleFavorite"
                     android:text=""
@@ -98,7 +98,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#76b184"
+                android:background="@color/detailGreen"
                 android:gravity="center"
                 android:text="@string/trailers"
                 android:textSize="30sp" />
@@ -117,7 +117,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#76b184"
+                android:background="@color/detailGreen"
                 android:gravity="center"
                 android:text="@string/reviews"
                 android:textSize="30sp" />

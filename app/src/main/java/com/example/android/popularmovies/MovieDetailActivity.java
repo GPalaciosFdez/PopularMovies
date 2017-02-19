@@ -12,8 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.android.popularmovies.data.FavoritesColumns;
-import com.example.android.popularmovies.data.FavoritesProvider;
+import com.example.android.popularmovies.data.FavoritesContract;
 import com.example.android.popularmovies.utilities.FetchTrailersTask;
 import com.example.android.popularmovies.utilities.ParcelableMovie;
 import com.squareup.picasso.Picasso;
@@ -55,7 +54,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 isFavorite = (movieData.getIsFavorite() == 1);
 
                 if (!isFavorite) {
-                    if (getContentResolver().query(FavoritesProvider.Favorites.withId(movieData.getId()), null, null, null, null).moveToFirst()) {
+                    if (getContentResolver().query(FavoritesContract.FavoritesEntry.buildUri(movieData.getId()), null, null, null, null).moveToFirst()) {
                         isFavorite = true;
                     } else {
                         mFavoriteButton.setText(getString(R.string.addFavorite));
@@ -132,17 +131,17 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         ContentValues values = new ContentValues();
 
-        values.put(FavoritesColumns.ID, movieData.getId());
-        values.put(FavoritesColumns.TITLE, movieData.getTitle());
-        values.put(FavoritesColumns.RELEASE_DATE, movieData.getReleaseDate());
-        values.put(FavoritesColumns.PATH_TO_POSTER, movieData.getPathToPoster());
-        values.put(FavoritesColumns.VOTE_AVERAGE, movieData.getVoteAverage());
-        values.put(FavoritesColumns.SYNOPSIS, movieData.getSynopsis());
-        values.put(FavoritesColumns.IS_FAVORITE, 1);
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID, movieData.getId());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_TITLE, movieData.getTitle());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_RELEASE_DATE, movieData.getReleaseDate());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_PATH_TO_POSTER, movieData.getPathToPoster());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_VOTE_AVERAGE, movieData.getVoteAverage());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_SYNOPSIS, movieData.getSynopsis());
+        values.put(FavoritesContract.FavoritesEntry.COLUMN_IS_FAVORITE, 1);
 
 
         try {
-            getContentResolver().insert(FavoritesProvider.Favorites.CONTENT_URI, values);
+            getContentResolver().insert(FavoritesContract.FavoritesEntry.CONTENT_URI, values);
         } catch (Exception e) {
             Log.e(TAG, "Error inserting", e);
         }
@@ -152,7 +151,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         String[] id = new String[]{movieData.getId()};
 
-        return getContentResolver().delete(FavoritesProvider.Favorites.CONTENT_URI, FavoritesColumns.ID + "=?", id);
+        return getContentResolver().delete(FavoritesContract.FavoritesEntry.buildUri(movieData.getId()), FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID + "=?", id);
 
     }
 

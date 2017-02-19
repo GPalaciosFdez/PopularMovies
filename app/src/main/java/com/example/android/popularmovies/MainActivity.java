@@ -19,14 +19,15 @@ import com.example.android.popularmovies.utilities.ParcelableMovie;
 
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.MoviesAdapterOnClickHandler{
 
+    private static final int INDEX_POPULAR = 0;
+    private static final int INDEX_RATING = 1;
+    private static final int INDEX_FAVORITES = 2;
+    private static final String SORT_BY_KEY = "sortBy";
     private RecyclerView mRecyclerView;
-
     private MoviesAdapter mMoviesAdapter;
-
     private ProgressBar mProgressIndicator;
     private TextView mErrorTextView;
-
-    private String sortBy = "popularity";
+    private int saveSorting;
 
 
     @Override
@@ -48,18 +49,26 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
         mMoviesAdapter = new MoviesAdapter(this);
         mRecyclerView.setAdapter(mMoviesAdapter);
 
-        loadMoviesData();
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(SORT_BY_KEY)) {
+                saveSorting = savedInstanceState.getInt(SORT_BY_KEY);
+            } else {
+                saveSorting = 0;
+            }
+        }
+
+        loadMoviesData(saveSorting);
 
     }
 
-    private void loadMoviesData(){
+    private void loadMoviesData(int saveSorting) {
         ShowMovies();
-        new FetchMoviesTask(this).execute(sortBy);
-    }
-
-    private void loadFavorites() {
-        ShowMovies();
-        new FetchFavoritesTask(this).execute();
+        if (saveSorting == INDEX_FAVORITES) {
+            new FetchFavoritesTask(this).execute();
+        } else {
+            String sortBy = (saveSorting == INDEX_POPULAR) ? "popular" : "top_rated";
+            new FetchMoviesTask(this).execute(sortBy);
+        }
     }
 
     private void ShowMovies(){
@@ -97,20 +106,28 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Mov
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.action_popularity){
-            sortBy = "popularity";
-            loadMoviesData();
+            saveSorting = INDEX_POPULAR;
+            loadMoviesData(saveSorting);
             return true;
         }
         if(item.getItemId() == R.id.action_rated){
-            sortBy = "vote_average";
-            loadMoviesData();
+            saveSorting = INDEX_RATING;
+            loadMoviesData(saveSorting);
             return true;
         }
         if (item.getItemId() == R.id.action_favorite) {
-            loadFavorites();
+            saveSorting = INDEX_FAVORITES;
+            loadMoviesData(saveSorting);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SORT_BY_KEY, saveSorting);
+    }
+
 }

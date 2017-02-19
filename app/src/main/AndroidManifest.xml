@@ -20,8 +20,8 @@
         <activity android:name=".MovieDetailActivity"/>
 
         <provider
-            android:name="com.example.android.popularmovies.data.generated.FavoritesProvider"
-            android:authorities="com.example.android.popularmovies.data.FavoritesProvider"
+            android:name=".data.FavoritesProvider"
+            android:authorities="com.example.android.popularmovies"
             android:exported="false" />
 
     </application>

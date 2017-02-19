@@ -5,8 +5,7 @@ import android.os.AsyncTask;
 import android.view.View;
 
 import com.example.android.popularmovies.MainActivity;
-import com.example.android.popularmovies.data.FavoritesColumns;
-import com.example.android.popularmovies.data.FavoritesProvider;
+import com.example.android.popularmovies.data.FavoritesContract;
 
 /**
  * Created by GPalacios on 16/02/17.
@@ -29,7 +28,7 @@ public class FetchFavoritesTask extends AsyncTask<Void, ParcelableMovie[], Curso
     @Override
     protected Cursor doInBackground(Void... params) {
 
-        return mainActivity.getContentResolver().query(FavoritesProvider.Favorites.CONTENT_URI, null, null, null, null);
+        return mainActivity.getContentResolver().query(FavoritesContract.FavoritesEntry.CONTENT_URI, null, null, null, null);
     }
 
     @Override
@@ -40,12 +39,12 @@ public class FetchFavoritesTask extends AsyncTask<Void, ParcelableMovie[], Curso
         ParcelableMovie[] favorites = new ParcelableMovie[cursor.getCount()];
 
         while (cursor.moveToNext()) {
-            String id = cursor.getString(cursor.getColumnIndex(FavoritesColumns.ID));
-            String title = cursor.getString(cursor.getColumnIndex(FavoritesColumns.TITLE));
-            String releaseDate = cursor.getString(cursor.getColumnIndex(FavoritesColumns.RELEASE_DATE));
-            String pathToPoster = cursor.getString(cursor.getColumnIndex(FavoritesColumns.PATH_TO_POSTER));
-            String voteAverage = cursor.getString(cursor.getColumnIndex(FavoritesColumns.VOTE_AVERAGE));
-            String synopsis = cursor.getString(cursor.getColumnIndex(FavoritesColumns.SYNOPSIS));
+            String id = cursor.getString(cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID));
+            String title = cursor.getString(cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_TITLE));
+            String releaseDate = cursor.getString(cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_RELEASE_DATE));
+            String pathToPoster = cursor.getString(cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_PATH_TO_POSTER));
+            String voteAverage = cursor.getString(cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_VOTE_AVERAGE));
+            String synopsis = cursor.getString(cursor.getColumnIndex(FavoritesContract.FavoritesEntry.COLUMN_SYNOPSIS));
 
             ParcelableMovie movie = new ParcelableMovie(id, title, releaseDate, pathToPoster, voteAverage, synopsis);
 

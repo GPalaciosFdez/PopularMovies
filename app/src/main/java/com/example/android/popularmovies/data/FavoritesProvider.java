@@ -1,53 +1,138 @@
 package com.example.android.popularmovies.data;
 
+import android.content.ContentValues;
+import android.content.UriMatcher;
+import android.database.Cursor;
 import android.net.Uri;
-
-import net.simonvt.schematic.annotation.ContentProvider;
-import net.simonvt.schematic.annotation.ContentUri;
-import net.simonvt.schematic.annotation.InexactContentUri;
-import net.simonvt.schematic.annotation.TableEndpoint;
+import android.support.annotation.Nullable;
 
 /**
  * Created by GPalacios on 15/02/17.
  */
 
-@ContentProvider(authority = FavoritesProvider.AUTHORITY, database = FavoritesDatabase.class)
-public final class FavoritesProvider {
+public final class FavoritesProvider extends android.content.ContentProvider {
 
-    static final String AUTHORITY = "com.example.android.popularmovies.data.FavoritesProvider";
+    public static final int CODE_FAVORITE = 100;
+    public static final int CODE_FAVORITE_WITH_ID = 101;
 
-    private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
+    private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private FavoritesDbHelper mOpenHelper;
 
-    private static Uri buildUri(String... paths) {
-        Uri.Builder builder = BASE_CONTENT_URI.buildUpon();
-        for (String path : paths) {
-            builder.appendPath(path);
+    public static UriMatcher buildUriMatcher() {
+
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+        final String authority = FavoritesContract.CONTENT_AUTHORITY;
+
+        matcher.addURI(authority, FavoritesContract.PATH_FAVORITES, CODE_FAVORITE);
+
+        matcher.addURI(authority, FavoritesContract.PATH_FAVORITES + "/#", CODE_FAVORITE_WITH_ID);
+
+        return matcher;
+    }
+
+    @Override
+    public boolean onCreate() {
+        mOpenHelper = new FavoritesDbHelper(getContext());
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        Cursor cursor;
+
+        switch (sUriMatcher.match(uri)) {
+
+            case CODE_FAVORITE_WITH_ID: {
+
+                String id = uri.getLastPathSegment();
+
+                String[] selectionArguments = new String[]{id};
+
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        FavoritesContract.FavoritesEntry.TABLE_NAME,
+                        projection,
+                        FavoritesContract.FavoritesEntry.COLUMN_MOVIE_ID + " = ? ",
+                        selectionArguments,
+                        null,
+                        null,
+                        sortOrder);
+
+                break;
+            }
+
+            case CODE_FAVORITE: {
+                cursor = mOpenHelper.getReadableDatabase().query(
+                        FavoritesContract.FavoritesEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+
+                break;
+            }
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        return builder.build();
+
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return cursor;
     }
 
-    interface Path {
-        String FAVORITES = "favorites";
+    @Nullable
+    @Override
+    public String getType(Uri uri) {
+        return null;
     }
 
-    @TableEndpoint(table = FavoritesDatabase.FAVORITES)
-    public static class Favorites {
-        @ContentUri(
-                path = Path.FAVORITES,
-                type = "vdn.android.cursor.dir/favorite")
+    @Nullable
+    @Override
+    public Uri insert(Uri uri, ContentValues values) {
+        long insert = mOpenHelper.getWritableDatabase().insert(
+                FavoritesContract.FavoritesEntry.TABLE_NAME,
+                null,
+                values);
 
-        public static final Uri CONTENT_URI = buildUri(Path.FAVORITES);
-
-        @InexactContentUri(
-                name = "FAVORITE_ID",
-                path = Path.FAVORITES + "/*",
-                type = "vnd.android.cursor.item/favorite",
-                whereColumn = FavoritesColumns.ID,
-                pathSegment = 1)
-
-        public static Uri withId(String id) {
-            return buildUri(Path.FAVORITES, id);
+        if (insert > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
         }
+
+        return uri;
     }
 
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        int numRowsDeleted;
+
+        if (null == selection) selection = "1";
+
+        switch (sUriMatcher.match(uri)) {
+
+            case CODE_FAVORITE_WITH_ID:
+                numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
+                        FavoritesContract.FavoritesEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        if (numRowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return numRowsDeleted;
+    }
+
+
+    @Override
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        return 0;
+    }
 }

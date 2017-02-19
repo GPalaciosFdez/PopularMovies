@@ -2,6 +2,8 @@ package com.example.android.popularmovies.utilities;
 
 import android.net.Uri;
 
+import com.example.android.popularmovies.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -15,13 +17,12 @@ import java.util.Scanner;
 
 public final class NetworkUtils {
 
-    private static final String API_KEY = "";
+    private static final String API_KEY = BuildConfig.THE_MOVIE_DB_API_TOKEN;
 
     private static final String MOVIE_IMG_BASE_URL = "http://image.tmdb.org/t/p";
     private static final String MOVIE_IMG_FILE_SIZE = "w185";
 
     private static final String MOVIE_DATA_BASE_URL = "http://api.themoviedb.org/3/";
-    private static final String MOVIE_DISCOVER_PATH = "discover";
 
     private static final String MOVIE_MOVIE_PATH = "movie";
     private static final String MOVIE_TRAILER_PATH = "videos";
@@ -29,9 +30,8 @@ public final class NetworkUtils {
 
     static URL buildMovieDataUrl(String query) {
         Uri builtUri = Uri.parse(MOVIE_DATA_BASE_URL).buildUpon()
-                .appendPath(MOVIE_DISCOVER_PATH)
                 .appendPath(MOVIE_MOVIE_PATH)
-                .appendQueryParameter("sort_by", query + ".desc")
+                .appendPath(query)
                 .appendQueryParameter("api_key", API_KEY)
                 .build();
 
